@@ -33,6 +33,8 @@ var currEnemy;
 
 var score;
 var scoreDisplay;
+var spikes = [];
+
 function startGame() {
     frame = 0;
     playerSpeed = 2.5;
@@ -213,7 +215,7 @@ function updateGameArea() {
             enemies[currEnemy].x = 100;
         else 
             enemies[currEnemy].x = 1000;
-        currEnemy = parseInt(Math.random()*9);
+        currEnemy = parseInt(Math.random()*10);
         moveEnemy(currEnemy);
     }
     
@@ -223,9 +225,9 @@ function updateGameArea() {
 function moveEnemy(given) {
 	score++;
     if (given < 5)
-        enemies[given].speedX = 2*(frame/100);
+        enemies[given].speedX = (2 + frame/50000);
     else 
-        enemies[given].speedX = -2*(frame/100);
+        enemies[given].speedX = (-2 - frame/50000);
 }
     
 function handleInput() {
