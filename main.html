@@ -23,14 +23,16 @@ var inAir;
 var maxAirTime;
 var airTime;
     
-var gravity = 6;    
+var gravity;
+var gravitySpeed;
     
 function startGame() {
     playerSpeed = 6;
     inAir = false;
     maxAirTime = 11;
     airTime = 0;
-    gravity = 6;   
+    gravity = 0;
+    gravitySpeed = 0.1;
     
     myGameArea.start();
 	platforms[0] = new component(200, 10, "red", canvasWidth/2-100, 100, "platform");
@@ -60,7 +62,9 @@ var myGameArea = {
             myGameArea.keys[e.keyCode] = true;
         })
         window.addEventListener('keyup', function (e) {
-            myGameArea.keys[e.keyCode] = false; 
+            myGameArea.keys[e.keyCode] = false;
+            if (e.keyCode == 87 || e.keyCode == 38)
+                airTime = 0;
         })
     },
 
@@ -153,12 +157,16 @@ function updateGameArea() {
         player.speedY = 0;
         airTime = 0;
         inAir = false;
+        gravity = 0;
     }
     
-    else
+    else {
+        gravity += gravitySpeed;
         player.speedY += gravity;
+    }
     
-    handleInput();
+    if (player.crashWithPlatforms() != 2)
+        handleInput();
     
     player.newPos();
     player.update();
