@@ -17,6 +17,9 @@
         document.write('<H1>' + 
         'You were killed by: ' + localStorage.getItem('deathCause')
         + '</H1>');
+		document.write('<H1>' + 
+        'Your score was: ' + localStorage.getItem('score')
+        + '</H1>');
 	document.onkeydown = checkKey;
 	document.onkeypress = checkKey;
 	function checkKey(e) {

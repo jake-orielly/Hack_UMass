@@ -359,6 +359,7 @@ function jump() {
     
 function gameOver() {
     localStorage.setItem('deathCause', '' + deathCause)
+	localStorage.setItem('score', '' + score)
     myGameArea.stop();
     sleep(500);
     window.location = "death.html";
