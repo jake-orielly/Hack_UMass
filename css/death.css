@@ -1,3 +1,9 @@
 h1{
-	align-self: center;
+	padding-left 100 px;
+	padding-top 50 px;
+	text-align: center;
+}
+p{
+	padding-left 100 px;
+	text-align: center;
 }
