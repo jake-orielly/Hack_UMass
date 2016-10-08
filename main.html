@@ -17,6 +17,7 @@ var canvasHeight = 800;
 var platforms = [];
     
 var player;
+var playerSpeed = 7;
     
 function startGame() {
     myGameArea.start();
@@ -35,6 +36,12 @@ var myGameArea = {
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 20);
+        window.addEventListener('keydown', function (e) {
+            myGameArea.key = e.keyCode;
+        })
+        window.addEventListener('keyup', function (e) {
+            myGameArea.key = false;
+        })
     },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -69,6 +76,11 @@ function component(width, height, color, x, y, type) {
 		  ctx.fillRect(this.x, this.y, this.width, this.height);
 		}
     }
+    
+    this.stopMove = function() {
+        this.speedX = 0;
+        this.speedY = 0;
+    }
 }
     
 function updateGameArea() {
@@ -76,11 +88,19 @@ function updateGameArea() {
     for (var i = 0; i < platforms.length; i++)
         platforms[i].update();
     
-    player.speedX = 5;
+    player.stopMove(); 
+    handleInput();
     player.newPos();
     player.update();
 }
 
+function handleInput() {
+    if (myGameArea.key && myGameArea.key == 37) {player.speedX = -1 * playerSpeed; }
+    if (myGameArea.key && myGameArea.key == 39) {player.speedX = playerSpeed; }
+    if (myGameArea.key && myGameArea.key == 38) {player.speedY = -1 * playerSpeed; }
+    if (myGameArea.key && myGameArea.key == 40) {player.speedY = playerSpeed; }
+}
+    
 </script>
 </body>
 </html>
