@@ -1,5 +1,6 @@
 <html>
 <head>
+<<<<<<< HEAD
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
@@ -84,6 +85,26 @@ function updateGameArea() {
 
     
     
+=======
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<style>
+
+	</style>
+</head>
+
+<body onload="startGame()">
+<script>
+	var myGamePiece;
+	var platforms = [];
+
+	function startGame() {
+		myGamePiece = new component(40, 100, "Kappa.png", 50, 550, "image", "player");
+		platforms[0] = new component(115, 15, "red", 150, 470, "red", "scene");
+		platforms[1] = new component(115, 15, "red", 345, 415, "red", "scene");
+		platforms[2] = new component(115, 15, "red", 545, 415, "red", "scene");
+		myGameArea.start();
+	}
+>>>>>>> 38115433519f0eb096c28f37d8d14e53adf92964
 </script>
 </body>
 </html>
