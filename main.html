@@ -38,13 +38,18 @@ var spikePics = [];
 var spikeChance = 0.6; //lower = more spikes
 var spikeStormChance = 0.85;
 var spikeStorm = 0;
-var spikeStormSound = new sound("music/spikeStorm.mp3");
 
 var deathCause = "Mysterious causes";
 
 var unitDone = false;
 var unitX;
 var unitY;
+
+var enemiesSave = [];    
+    
+var scenario1Score = 35;
+var scenario1Done = 0;
+var scenario1Start = 0;
     
 function startGame() {
     frame = 0;
@@ -206,10 +211,63 @@ function updateGameArea() {
         makeEnemy(0);
     }
     
-    else if (score != 0 && score%4 == 0) {
+    else if (score != 0 && score%4 == 0 && !(score > scenario1Score && scenario1Done < 4)) {
         makeEnemy(enemies.length);
     }
 
+    if (score > scenario1Score && scenario1Done < 4) {
+        var clear = true;
+        if (score > 50)
+            alert(scenario1Done);
+        for (var i = 0; i < enemies.length; i++) {
+            if (!(enemies[i].data.x < 0 || enemies[i].data.x > canvasWidth || enemies[i].data.y < 0 || enemies[i].data.y > canvasHeight))
+                clear = false;
+        }
+        if (clear && scenario1Done == 3) {
+            //enemies = enemiesSave;
+            enemies = [];
+            for (var i = 0; i < 7; i++)
+                makeEnemy(i);
+            score += 12;
+            scenario1Done = 4;
+        }
+        
+        if (clear && frame > (scenario1Start + 200) && scenario1Done == 1) {
+            score += 10;
+            for (var i = 0; i < 24; i++) {
+                if (i < 8 || i > 11)
+                    enemies[i] = {type: "spike", data: new component(25, 25, "art/RightSpike.png", 1100, 65+25*i, "image")};
+            }
+            for (var i = 24; i < 48; i++) {
+                if (i < 24+8 || i > 24+11)
+                    enemies[i] = {type: "spike", data: new component(25, 25, "art/LeftSpike.png", 100, 65+25*(i-24), "image")};
+            }
+            scenario1Start = frame;   
+            scenario1Done = 2;
+        }
+        else if (clear && scenario1Done == 0) {
+            enemiesSave = enemies;
+            for (var i = 0; i < 18; i++)
+                enemies[i] = {type: "spike", data: new component(25, 25, "art/RightSpike.png", 1100, 200+25*i, "image")};
+            for (var i = 18; i < 36; i++)
+                enemies[i] = {type: "spike", data: new component(25, 25, "art/LeftSpike.png", 100, 200+25*(i-18), "image")};
+            scenario1Start = frame;
+        }
+        
+        if (scenario1Start + 250 == frame && scenario1Done == 0) {
+            for (var i = 0; i < enemies.length; i++)
+                moveEnemy(enemies[i].data);  
+            scenario1Done = 1;
+            scenario1Start = frame;
+        }
+        else if (scenario1Start + 350 == frame && scenario1Done == 2) {
+            for (var i = 0; i < enemies.length; i++)
+                moveEnemy(enemies[i].data);  
+            scenario1Done = 3;
+            scenario1Start = frame;
+        }
+        //scenario1Done = true;
+    }
     
     for (var i = 0; i < enemies.length; i++) {
         if (enemies[i] && enemies[i].data.crashWith(player)) {
@@ -248,7 +306,7 @@ function updateGameArea() {
                 moveEnemy(enemies[i].data);
             }
         }
-        if (enemies[i] && (enemies[i].data.x < 0 || enemies[i].data.x > canvasWidth || enemies[i].data.y < 0 || enemies[i].data.y > canvasHeight))
+        if (enemies[i] && (enemies[i].data.x < 0 || enemies[i].data.x > canvasWidth || enemies[i].data.y < 0 || enemies[i].data.y > canvasHeight)&& !(score > scenario1Score && scenario1Done < 4))
             makeEnemy(i);
     }
     
@@ -256,6 +314,15 @@ function updateGameArea() {
         enemies[i].data.update();
     }
     player.newPos();
+    
+    if (player.x > canvasWidth-player.width)
+        player.x = canvasWidth-player.width;
+    else if (player.x < 0)
+        player.x = 0;
+    
+    if (player.y < 0)
+        player.y = 0;
+    
     player.update();
     
     frame++;
@@ -267,7 +334,6 @@ function makeEnemy(given) {
         if (Math.random() > spikeStormChance) {
             spikeChance = 0.2;
             spikeStorm += 20;
-            spikeStormSound.play();
         }
     }
     
@@ -330,14 +396,14 @@ function getUnitCords(givenX, givenY) {
 }
     
 function moveEnemy(given) {
-    if (given.y < 31)
-        given.speedY = (2 + frame/50000);
-    else if (given.y > 619)
-        given.speedY = (-2 - frame/50000);
-    else if (given.x < 500) 
+    if (given.x < 300) 
         given.speedX = (2 + frame/50000);
-    else 
+    else if (given.x > 900)
         given.speedX = (-2 - frame/50000);
+    else if (given.y < 31)
+        given.speedY = (2 + frame/50000);
+    else 
+        given.speedY = (-2 - frame/50000);
 }
     
 function handleInput() {
