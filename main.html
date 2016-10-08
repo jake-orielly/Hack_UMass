@@ -35,7 +35,9 @@ var score;
 var scoreDisplay;
 var spikePics = [];
 
-var spikeChance = 0.6; //lower = more spikes    
+var spikeChance = 0.6; //lower = more spikes
+var spikeStormChance = 0.85;
+var spikeStorm = 0;
     
 function startGame() {
     frame = 0;
@@ -248,6 +250,22 @@ function updateGameArea() {
 
 function makeEnemy(given) {
     score++;
+    
+    if (score > 10) {
+        if (Math.random > spikeStormChance) {
+            spikeChance = 0.2;
+            spikeStorm += 20;
+            alert(1);
+        }
+    }
+    
+    if (spikeStorm > 0)
+        spikeStorm--;
+    else if (spikeStorm == 0) {
+        spikeChance = 0.6;
+        spikeStorm = -20;
+    }
+    
     enemyStartFrame[given] = frame;
     if (score > 5) {
         if (Math.random() > spikeChance) {
