@@ -37,10 +37,11 @@ var myGameArea = {
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 20);
         window.addEventListener('keydown', function (e) {
-            myGameArea.key = e.keyCode;
+            myGameArea.keys = (myGameArea.keys || []);
+            myGameArea.keys[e.keyCode] = true;
         })
         window.addEventListener('keyup', function (e) {
-            myGameArea.key = false;
+            myGameArea.keys[e.keyCode] = false; 
         })
     },
     clear : function() {
@@ -95,10 +96,14 @@ function updateGameArea() {
 }
 
 function handleInput() {
-    if (myGameArea.key && myGameArea.key == 37) {player.speedX = -1 * playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[65]) {player.speedX = -1*playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[68]) {player.speedX = playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[87]) {player.speedY = -1 * playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[83]) {player.speedY = playerSpeed; }
+    /*if (myGameArea.key && myGameArea.key == 37) {player.speedX = -1 * playerSpeed; }
     if (myGameArea.key && myGameArea.key == 39) {player.speedX = playerSpeed; }
     if (myGameArea.key && myGameArea.key == 38) {player.speedY = -1 * playerSpeed; }
-    if (myGameArea.key && myGameArea.key == 40) {player.speedY = playerSpeed; }
+    if (myGameArea.key && myGameArea.key == 40) {player.speedY = playerSpeed; }*/
 }
     
 </script>
