@@ -38,6 +38,9 @@ var spikePics = [];
 var spikeChance = 0.6; //lower = more spikes
 var spikeStormChance = 0.85;
 var spikeStorm = 0;
+var spikeStormSound = new sound("music/spikeStorm.mp3");
+
+var deathCause = "Mysterious causes";
     
 function startGame() {
     frame = 0;
@@ -191,22 +194,29 @@ function updateGameArea() {
         handleInput();
 	
     if (player.y+player.height/2 > canvasHeight) {
+        deathCause = "A long fall.";
         gameOver();
     }
     
     if (frame == 250) {
         makeEnemy(0);
     }
-   
+    if (score == 3)
+        makeEnemy(1);
     else if (score != 0 && score%3 == 0) {
-        makeEnemy(score/3);
+        makeEnemy(enemies.length);
     }
 
     
     for (var i = 0; i < enemies.length; i++) {
         if (enemies[i] && enemies[i].data.crashWith(player)) {
-            if (enemies[i].type == "spike") 
+            if (enemies[i].type == "spike") {
+                deathCause = "A terrible stabbing";
+                if (spikeStorm)
+                    deathCause = deathCause + " during a spike storm";
+                deathCause = deathCause + ".";
                 gameOver();
+            }
             else {
                 player.speedX = enemies[i].data.speedX;
                 if (player.x > 750 || player.x < 450) {
@@ -250,17 +260,18 @@ function updateGameArea() {
 
 function makeEnemy(given) {
     score++;
-    
-    if (score > 10) {
-        if (Math.random > spikeStormChance) {
+    if (score > 10 && !spikeStorm) {
+        if (Math.random() > spikeStormChance) {
             spikeChance = 0.2;
             spikeStorm += 20;
-            alert(1);
+            spikeStormSound.play();
         }
     }
     
     if (spikeStorm > 0)
         spikeStorm--;
+    else if (spikeStorm < 0)
+        spikeStorm++;
     else if (spikeStorm == 0) {
         spikeChance = 0.6;
         spikeStorm = -20;
@@ -317,6 +328,7 @@ function jump() {
 }
     
 function gameOver() {
+    localStorage.setItem('deathCause', '' + deathCause)
     myGameArea.stop();
     sleep(500);
     window.location = "death.html";
@@ -329,6 +341,21 @@ function sleep(milliseconds) {
       break;
     }
   }
+}    
+
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }
 }    
     
 </script>
