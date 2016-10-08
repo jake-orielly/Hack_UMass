@@ -30,7 +30,9 @@ var gravity;
 var gravitySpeed;
     
 var currEnemy;
-    
+
+var score;
+
 function startGame() {
     frame = 0;
     playerSpeed = 2.5;
@@ -40,6 +42,7 @@ function startGame() {
     gravity = 0;
     gravitySpeed = 0.01;
     currEnemy = 0;
+	score = 0;
     
     myGameArea.start();
 	platforms[0] = new component(200, 10, "red", canvasWidth/2-100, 100, "platform");
@@ -158,6 +161,7 @@ function component(width, height, color, x, y, type) {
     
 function updateGameArea() {
     myGameArea.clear();
+	//document.write('score: ' + score);
     for (var i = 0; i < platforms.length; i++)
         platforms[i].update();
     for (var i = 0; i < enemies.length; i++) {
@@ -205,6 +209,7 @@ function updateGameArea() {
 }
 
 function moveEnemy(given) {
+	score++;
     if (given < 5)
         enemies[given].speedX = 2*(frame/100);
     else 
