@@ -167,7 +167,6 @@ function updateGameArea() {
     for (var i = 0; i < platforms.length; i++)
         platforms[i].update();
     for (var i = 0; i < enemies.length; i++) {
-        enemies[i].data.update();
         enemies[i].data.newPos();
     }
     player.stopMove(); 
@@ -242,6 +241,9 @@ function updateGameArea() {
             makeEnemy(i);
     }
     
+    for (var i = 0; i < enemies.length; i++) {
+        enemies[i].data.update();
+    }
     player.newPos();
     player.update();
     
