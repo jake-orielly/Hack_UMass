@@ -11,20 +11,27 @@ canvas {
 <body onload="startGame()">
 <script>
 
-var canvasWidth = 600;
-var canvasHeight = 800;
+var canvasWidth = 1200;
+var canvasHeight = 600;
 
 var platforms = [];
-    
 var player;
+var enemies = [];
     
 function startGame() {
     myGameArea.start();
-    platforms[0] = new component(80, 10, "red", canvasWidth/2-40, 400, "platform");
-    platforms[1] = new component(80, 10, "red", canvasWidth/2-40, 440, "platform");
-    platforms[2] = new component(80, 10, "red", canvasWidth/2-40, 480, "platform");
+	platforms[0] = new component(200, 10, "red", canvasWidth/2-100, 100, "platform");
+    platforms[1] = new component(200, 10, "red", canvasWidth/2-100, 200, "platform");
+    platforms[2] = new component(200, 10, "red", canvasWidth/2-100, 300, "platform");
+    platforms[3] = new component(200, 10, "red", canvasWidth/2-100, 400, "platform");
+	platforms[4] = new component(200, 10, "red", canvasWidth/2-100, 500, "platform");
     
-    player = new component(80, 80, "art/Kappa.png", 400, 400, "image");
+    player = new component(25, 25, "art/Player.png", 400, 400, "image");
+	enemies[0] = new component(25, 25, "art/Enemy.png", 100, 100, "image");
+	enemies[1] = new component(25, 25, "art/Enemy.png", 100, 200, "image");
+	enemies[2] = new component(25, 25, "art/Enemy.png", 100, 300, "image");
+	enemies[3] = new component(25, 25, "art/Enemy.png", 100, 400, "image");
+	enemies[4] = new component(25, 25, "art/Enemy.png", 100, 500, "image");
 }
 
 var myGameArea = {
@@ -75,10 +82,12 @@ function updateGameArea() {
     myGameArea.clear();
     for (var i = 0; i < platforms.length; i++)
         platforms[i].update();
-    
+    for (var i = 0; i < enemies.length; i++)
+        enemies[i].update();
     player.speedX = 5;
     player.newPos();
     player.update();
+	
 }
 
 </script>
