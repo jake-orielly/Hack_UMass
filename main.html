@@ -29,12 +29,11 @@ var airTime;
 var gravity;
 var gravitySpeed;
     
-var currEnemy;
 var enemyStartFrame = [];
     
 var score;
 var scoreDisplay;
-var spikes = [];
+var spikePics = [];
 
 function startGame() {
     frame = 0;
@@ -44,7 +43,6 @@ function startGame() {
     airTime = 0;
     gravity = 0;
     gravitySpeed = 0.01;
-    currEnemy = 0;
 	score = 0;
     
     myGameArea.start();
@@ -54,13 +52,6 @@ function startGame() {
 	}
     
     player = new component(25, 25, "art/Player.png", 550, 450, "image");
-	
-	/*for (var i = 0; i < 20; i++) {
-		enemies[i] = new component(25, 25, "art/Enemy.png", 100, 70+i*25, "image");
-	}
-	for (var i = 20; i < 40; i++) {
-		enemies[i] = new component(25, 25, "art/Enemy.png", 1000, 70+(i-20)*25, "image");
-	}*/
 
     scoreDisplay = new component("40px","Courier New", "hello",900,50,"text");
 }
@@ -176,8 +167,8 @@ function updateGameArea() {
     for (var i = 0; i < platforms.length; i++)
         platforms[i].update();
     for (var i = 0; i < enemies.length; i++) {
-        enemies[i].update();
-        enemies[i].newPos();
+        enemies[i].data.update();
+        enemies[i].data.newPos();
     }
     player.stopMove(); 
     
@@ -195,19 +186,6 @@ function updateGameArea() {
     
     if (player.crashWithPlatforms() != 2)
         handleInput();
-    
-    if (enemies[currEnemy] && enemies[currEnemy].crashWith(player)) {
-        player.speedX = enemies[currEnemy].speedX;
-        if (player.x > 750 || player.x < 450) {
-            player.speedY = 2;
-            gravity = 2;
-        }
-        else 
-            player.speedY = 0;
-    }
-    
-    player.newPos();
-    player.update();
 	
     if (player.y+player.height/2 > canvasHeight) {
         gameOver();
@@ -229,29 +207,43 @@ function updateGameArea() {
 
     
     for (var i = 0; i < enemies.length; i++) {
-        if (frame > enemyStartFrame[i]+160 && frame < enemyStartFrame[i]+160*3 && frame%80 == 0) {
-            enemies[i].image.src = "art/EnemyWarning.png";   
-        }
-        else if (frame > enemyStartFrame[i]+160 && frame < enemyStartFrame[i]+160*3 && frame%40 == 0) {
-            enemies[i].image.src = "art/Enemy.png";   
-        }
-        else if (frame == enemyStartFrame[i]+160*3) {
-            enemies[i].image.src = "art/EnemyWarning.png";
-            moveEnemy(enemies[i]);
+        if (enemies[i] && enemies[i].data.crashWith(player)) {
+            if (enemies[i].type = "spike") 
+                gameOver();
+            else {
+                player.speedX = enemies[i].data.speedX;
+                if (player.x > 750 || player.x < 450) {
+                    player.speedY = 2;
+                    gravity = 2;
+                }
+                else 
+                    player.speedY = 0;
+           }
         }
         
-        if (enemies[i] && (enemies[i].x < 0 || enemies[i].x > canvasWidth))
+        if (enemies[i].type == "block") {
+            if (frame > enemyStartFrame[i]+160 && frame < enemyStartFrame[i]+160*3 && frame%80 == 0){
+                enemies[i].data.image.src = "art/EnemyWarning.png";   
+            }
+            else if (frame > enemyStartFrame[i]+160 && frame < enemyStartFrame[i]+160*3 && frame%40 == 0){
+                enemies[i].data.image.src = "art/Enemy.png";   
+            }
+            else if (frame == enemyStartFrame[i]+160*3 ){
+                enemies[i].data.image.src = "art/EnemyWarning.png";
+                moveEnemy(enemies[i].data);
+            }
+        }
+        else {
+            if (frame == enemyStartFrame[i]+160*3 ){
+                moveEnemy(enemies[i].data);
+            }
+        }
+        if (enemies[i] && (enemies[i].data.x < 0 || enemies[i].data.x > canvasWidth))
             makeEnemy(i);
     }
-    /*if (enemies[currEnemy].x > canvasWidth + 50 || enemies[currEnemy].x < 0){
-        enemies[currEnemy].speedX = 0;
-        if (currEnemy < 20)
-            enemies[currEnemy].x = 100;
-        else 
-            enemies[currEnemy].x = 1000;
-        currEnemy = parseInt(Math.random()*40);
-        moveEnemy(currEnemy);
-    }*/
+    
+    player.newPos();
+    player.update();
     
     frame++;
 }
@@ -259,7 +251,25 @@ function updateGameArea() {
 function makeEnemy(given) {
     score++;
     enemyStartFrame[given] = frame;
-    enemies[given] = new component(25, 25, "art/Enemy.png", 100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25, "image");
+    if (score > 5) {
+        if (Math.random() > 0.6) {
+            var orientation = Math.round(Math.random());
+            
+            if (orientation == 0)
+                enemies[given] = {type: "spike", data: new component(25, 25, "art/RightSpike.png", 1000, 70+(Math.random()*19)*25, "image")};
+            else if (orientation == 1)
+                enemies[given] = {type: "spike", data: new component(25, 25, "art/LeftSpike.png", 100, 70+(Math.random()*19)*25, "image")};
+            /*else if (orientation == 2)
+                enemies[given] = {type: "spike", data: new component(25, 25, "art/FallingSpike.png", 100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25, "image")};
+            else
+                enemies[given] = {type: "spike", data: new component(25, 25, "art/LeftSpike.png", 100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25, "image")};*/
+        }
+        else 
+            enemies[given] = {type: "block", data: new component(25, 25, "art/Enemy.png", 100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25, "image")};
+    }
+    else {
+        enemies[given] = {type: "block", data: new component(25, 25, "art/Enemy.png", 100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25, "image")};
+    }
 }
     
 function moveEnemy(given) {
@@ -288,9 +298,19 @@ function jump() {
     
 function gameOver() {
     myGameArea.stop();
+    sleep(500);
     window.location = "death.html";
 }
 
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}    
+    
 </script>
 </body>
 </html>
