@@ -108,14 +108,14 @@ function updateGameArea() {
 }
 
 function handleInput() {
-    if (myGameArea.keys && myGameArea.keys[65]) {player.speedX = -1*playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[68]) {player.speedX = playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[87]) {player.speedY = -1 * playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[83]) {player.speedY = playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[37]) {player.speedX = -1 * playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[39]) {player.speedX = playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[38]) {player.speedY = -1 * playerSpeed; }
-    if (myGameArea.keys && myGameArea.keys[40]) {player.speedY = playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[65]) {player.speedX = -1 * playerSpeed; }//left A
+    if (myGameArea.keys && myGameArea.keys[68]) {player.speedX = playerSpeed; }		//right D
+    if (myGameArea.keys && myGameArea.keys[87]) {player.speedY = -1 * playerSpeed; }//up W
+    if (myGameArea.keys && myGameArea.keys[83]) {player.speedY = playerSpeed; }		//down S
+    if (myGameArea.keys && myGameArea.keys[37]) {player.speedX = -1 * playerSpeed; }//left arrow
+    if (myGameArea.keys && myGameArea.keys[39]) {player.speedX = playerSpeed; }		//right arrow 
+    if (myGameArea.keys && myGameArea.keys[38]) {player.speedY = -1 * playerSpeed; }//up arrow
+    if (myGameArea.keys && myGameArea.keys[40]) {player.speedY = playerSpeed; }		//down arrow
 }
 
 </script>
