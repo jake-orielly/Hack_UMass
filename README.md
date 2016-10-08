@@ -8,7 +8,7 @@ Mix of hard timing and difficult puzzles?
 3. Spawn rate increases as time passes
 
 Can't go through platforms/enemies in any way, shape, or form
-Only way to die is by hitting the bottom. (Requires a reset button)
+Only ways to die are by hitting the bottom or a spike. (Requires a reset button)
 Jump has a max time (1 second? 0.5 second?). If jump key hasn't been released, gravity starts then
 Potential double jump? (Counter for jump = 1. Set to 0 if jump is released then pressed again) 
 Blocks come flying at you (more and more later on). Same collision as platforms/enemies.
