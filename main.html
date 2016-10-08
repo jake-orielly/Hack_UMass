@@ -207,7 +207,7 @@ function updateGameArea() {
     
     for (var i = 0; i < enemies.length; i++) {
         if (enemies[i] && enemies[i].data.crashWith(player)) {
-            if (enemies[i].type = "spike") 
+            if (enemies[i].type == "spike") 
                 gameOver();
             else {
                 player.speedX = enemies[i].data.speedX;
