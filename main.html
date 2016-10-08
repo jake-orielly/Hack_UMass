@@ -9,7 +9,7 @@ canvas {
 </style>
 </head>
 <body onload="startGame()">
-<embed name="BrainPower" autoplay= "true" loop="true" hidden="true" src="music/BrainPower.mp3"></embed>
+<!--<embed name="BrainPower" autoplay= "true" loop="true" hidden="true" src="music/BrainPower.mp3"></embed>-->
 <script>
 
 var canvasWidth = 1200;
@@ -30,7 +30,8 @@ var gravity;
 var gravitySpeed;
     
 var currEnemy;
-
+var enemyStartFrame;
+    
 var score;
 var scoreDisplay;
 var spikes = [];
@@ -54,12 +55,12 @@ function startGame() {
     
     player = new component(25, 25, "art/Player.png", 550, 450, "image");
 	
-	for (var i = 0; i < 20; i++) {
+	/*for (var i = 0; i < 20; i++) {
 		enemies[i] = new component(25, 25, "art/Enemy.png", 100, 70+i*25, "image");
 	}
 	for (var i = 20; i < 40; i++) {
 		enemies[i] = new component(25, 25, "art/Enemy.png", 1000, 70+(i-20)*25, "image");
-	}
+	}*/
 
     scoreDisplay = new component("40px","Courier New", "hello",900,50,"text");
 }
@@ -195,6 +196,16 @@ function updateGameArea() {
     if (player.crashWithPlatforms() != 2)
         handleInput();
     
+    if (enemies[currEnemy] && enemies[currEnemy].crashWith(player)) {
+        player.speedX = enemies[currEnemy].speedX;
+        if (player.x > 750 || player.x < 450) {
+            player.speedY = 2;
+            gravity = 2;
+        }
+        else 
+            player.speedY = 0;
+    }
+    
     player.newPos();
     player.update();
 	
@@ -202,10 +213,24 @@ function updateGameArea() {
         gameOver();
     }
     
-    if (frame == 250)
-        moveEnemy(currEnemy);
+    if (frame == 250) {
+        makeEnemy();
+    }
     
-    if (enemies[currEnemy].x > canvasWidth + 50 || enemies[currEnemy].x < 0){
+    if (frame > enemyStartFrame+160 && frame < enemyStartFrame+160*3 && frame%80 == 0) {
+        enemies[currEnemy].image.src = "art/EnemyWarning.png";   
+    }
+    else if (frame > enemyStartFrame+160 && frame < enemyStartFrame+160*3 && frame%40 == 0) {
+        enemies[currEnemy].image.src = "art/Enemy.png";   
+    }
+    else if (frame == enemyStartFrame+160*3) {
+        enemies[currEnemy].image.src = "art/EnemyWarning.png";
+        moveEnemy(enemies[currEnemy]);
+    }
+    
+    if (enemies[currEnemy] && (enemies[currEnemy].x < 0 || enemies[currEnemy].x > canvasWidth))
+        makeEnemy();
+    /*if (enemies[currEnemy].x > canvasWidth + 50 || enemies[currEnemy].x < 0){
         enemies[currEnemy].speedX = 0;
         if (currEnemy < 20)
             enemies[currEnemy].x = 100;
@@ -213,17 +238,22 @@ function updateGameArea() {
             enemies[currEnemy].x = 1000;
         currEnemy = parseInt(Math.random()*40);
         moveEnemy(currEnemy);
-    }
+    }*/
     
     frame++;
 }
 
+function makeEnemy() {
+    enemyStartFrame = frame;
+    enemies[0] = new component(25, 25, "art/Enemy.png", 100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25, "image");
+}
+    
 function moveEnemy(given) {
 	score++;
-    if (given < 20)
-        enemies[given].speedX = (2 + frame/50000);
+    if (given.x < 500) 
+        given.speedX = (2 + frame/50000);
     else 
-        enemies[given].speedX = (-2 - frame/50000);
+        given.speedX = (-2 - frame/50000);
 }
     
 function handleInput() {
