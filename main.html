@@ -112,10 +112,10 @@ function handleInput() {
     if (myGameArea.keys && myGameArea.keys[68]) {player.speedX = playerSpeed; }
     if (myGameArea.keys && myGameArea.keys[87]) {player.speedY = -1 * playerSpeed; }
     if (myGameArea.keys && myGameArea.keys[83]) {player.speedY = playerSpeed; }
-    /*if (myGameArea.key && myGameArea.key == 37) {player.speedX = -1 * playerSpeed; }
-    if (myGameArea.key && myGameArea.key == 39) {player.speedX = playerSpeed; }
-    if (myGameArea.key && myGameArea.key == 38) {player.speedY = -1 * playerSpeed; }
-    if (myGameArea.key && myGameArea.key == 40) {player.speedY = playerSpeed; }*/
+    if (myGameArea.keys && myGameArea.keys[37]) {player.speedX = -1 * playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[39]) {player.speedX = playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[38]) {player.speedY = -1 * playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[40]) {player.speedY = playerSpeed; }
 }
 
 </script>
