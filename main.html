@@ -392,6 +392,10 @@ function getUnitCords(givenX, givenY) {
                 unitDone = false;
         }
     }
+    if (score < 11) {
+        if (givenX < 300 || givenX > 900) 
+            unitY = player.y;
+    }
     return unitDone;
 }
     
