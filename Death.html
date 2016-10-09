@@ -22,6 +22,12 @@
     
 <script>
     var score = localStorage.getItem('score');
+    
+    if (!localStorage.getItem("highScore"))
+        localStorage.getItem("highScore") = 0;
+    if (localStorage.getItem("highScoreName")
+        localStorage.getItem("highScoreName") = "Nobody";
+    
     if (score > parseInt(localStorage.getItem("highScore"))) {
         var name = prompt("You got the high score! Enter your name:"," "); 
         localStorage.setItem("highScoreName", name + " : ");
