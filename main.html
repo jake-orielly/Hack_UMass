@@ -4,7 +4,7 @@
 <style>
 canvas {
     border:1px solid #d3d3d3;
-    background-color: #dddddd;
+    background-color: #F6F6F6;
 }
 </style>
 </head>
@@ -49,7 +49,7 @@ var enemiesSave = [];
     
 var scenario1Score = 35;
 var scenario1Done = 0;
-var scenario1Start = 0;
+var scenario1Start = 0;  
     
 function startGame() {
     frame = 0;
@@ -122,7 +122,7 @@ function component(width, height, color, x, y, type) {
         ctx = myGameArea.context;
 		if (this.type == "text") { //called if the component is a piece of text
             ctx.font = this.width + " " + this.height;
-            ctx.fillStyle = "rgba(0, 78, 225, 1)";
+            ctx.fillStyle = "#DE1B1B";
             ctx.fillText(this.color, this.x, this.y);
           }
         else if(type == "image") {
