@@ -273,7 +273,7 @@ function updateGameArea() {
         if (enemies[i] && enemies[i].data.crashWith(player)) {
             if (enemies[i].type == "spike") {
                 deathCause = "A terrible stabbing";
-                if (spikeStorm)
+                if (spikeStorm > 0)
                     deathCause = deathCause + " during a spike storm";
                 deathCause = deathCause + ".";
                 gameOver();

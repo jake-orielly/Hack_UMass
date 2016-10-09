@@ -1,32 +1,64 @@
 <html>
-
+<style>
+    body {
+        background-color: #F6F6F6;
+        color: #DE1B1B;
+    }
+    .boxed {
+        border: 18px solid #2B2B2B;
+        padding: 25px;
+        margin: 25px;
+    }
+</style>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link href="css/death.css" rel="stylesheet">
 </head>
 
 <body>
-	<h1>PRESS THE SPACEBAR TO START THE GAME</h1>
-	<p>Hack UMass Platformer</p>
-	<p>Try to stay on the stage for as long as possible!</p>
-	<p>Falling off or getting hit by a spike results in death</p>
-	<p>By: Daoxu Ye and Jake O'Rielly</p>
+    <br><br><br>
+    <h1>PRESS THE SPACEBAR TO START THE GAME</h1>
+    <br>
     
 <script>
+    var score = localStorage.getItem('score');
+    if (score > parseInt(localStorage.getItem("highScore"))) {
+        var name = prompt("You got the high score! Enter your name:"," "); 
+        localStorage.setItem("highScoreName", name + " : ");
+        localStorage.setItem("highScore", score);
+    }
+    
     if (localStorage.getItem('deathCause'))
         document.write('<H1>' + 
         'You were killed by: ' + localStorage.getItem('deathCause')
         + '</H1>');
 		document.write('<H1>' + 
-        'Your score was: ' + localStorage.getItem('score')
+        'Your score was: ' + score
         + '</H1>');
+    
+    
+    document.write("<H1> <centered> " + "HIGHSCORE" + "</centered> </H1>");
+    document.write("<H1> <centered> " + localStorage.getItem('highScoreName') + localStorage.getItem('highScore') + "</centered> </H1>");
+    
 	document.onkeydown = checkKey;
 	document.onkeypress = checkKey;
 	function checkKey(e) {
 		if (e.keyCode == 32){
 			window.location = "main.html";	
 		}
+                if (e.keyCode == 27){
+			window.location = "start.html";	
+		}
 	}
 </script>
+    <br>
+    <br> <br>
+    <!--<div class="boxed">-->
+        <p>Hack UMass Platformer</p>
+        <p>Try to stay on the stage for as long as possible!</p>
+        <p>Falling off or getting hit by a spike results in death</p>
+        <p>By: Daoxu Ye and Jake O'Rielly</p>
+    <!--</div>-->
+    <br>
 </body>
 </html>
