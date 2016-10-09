@@ -1,0 +1,396 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #F6F6F6;
+}
+</style>
+</head>
+<body onload="startGame()">
+<!--<embed name="BrainPower" autoplay= "true" loop="true" hidden="true" src="music/BrainPower.mp3"></embed>-->
+<script>
+
+var canvasWidth = 1200;
+var canvasHeight = 650;
+
+var frame;    
+    
+var platforms = [];
+var player;
+var enemies = [];
+
+var playerSpeed;
+var inAir;
+var maxAirTime;
+var airTime;
+    
+var gravity;
+var gravitySpeed;
+    
+var enemyStartFrame = [];
+    
+var score;
+var scoreDisplay;
+var spikePics = [];
+
+var spikeChance = 0.6; //lower = more spikes
+var spikeStormChance = 0.85;
+var spikeStorm = 0;
+
+var deathCause = "Mysterious causes";
+
+var unitDone = false;
+var unitX;
+var unitY;
+
+var enemiesSave = [];    
+    
+var scenario1Score = 35;
+var scenario1Done = 0;
+var scenario1Start = 0;  
+    
+function startGame() {
+    frame = 0;
+    playerSpeed = 2.5;
+    inAir = false;
+    maxAirTime = 44;
+    airTime = 0;
+    gravity = 0;
+    gravitySpeed = 0.01;
+	score = 0;
+    
+    myGameArea.start();
+	
+	for (var i = 0; i < 5; i++) {
+		platforms[i] = new component(200, 10, "red", canvasWidth/2-100, 150+100*i, "platform");
+	}
+    
+    player = new component(25, 25, "art/Player.png", 550, 500, "image");
+
+    scoreDisplay = new component("40px","Courier New", "hello",900,50,"text");
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 4);
+		window.addEventListener('keydown', function (e) {
+            myGameArea.keys = (myGameArea.keys || []);
+            myGameArea.keys[e.keyCode] = true;
+        })
+        window.addEventListener('keyup', function (e) {
+            myGameArea.keys[e.keyCode] = false;
+            if (e.keyCode == 87 || e.keyCode == 38)
+                airTime = 0;
+        })
+    },
+
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    }
+}
+
+function component(width, height, color, x, y, type) {
+    this.width = width;
+    this.height = height;
+    this.x = x;
+    this.y = y;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.type = type;
+    this.color = color;
+    if (this.type == "image") {
+        this.image = new Image();
+        this.image.src = color;
+    }
+    
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+    }
+    
+    this.update = function() {
+        ctx = myGameArea.context;
+		if (this.type == "text") { //called if the component is a piece of text
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = "#DE1B1B";
+            ctx.fillText(this.color, this.x, this.y);
+          }
+        else if(type == "image") {
+		  ctx.drawImage(this.image, 
+			this.x, 
+			this.y,
+			this.width, this.height);
+		} else {
+		  ctx.fillStyle = color;
+		  ctx.fillRect(this.x, this.y, this.width, this.height);
+		}
+    }
+    
+    this.crashWith = function(otherobj) {
+        var myLeft = this.x;
+        var myRight = this.x + (this.width);
+        var myTop = this.y;
+        var myBottom = this.y + (this.height);
+        var otherLeft = otherobj.x;
+        var otherRight = otherobj.x + (otherobj.width);
+        var otherTop = otherobj.y;
+        var otherBottom = otherobj.y + (otherobj.height);
+		var crash = true;
+		
+        if ((myBottom < otherTop) ||
+               (myTop > otherBottom) ||
+               (myRight < otherLeft) ||
+               (myLeft > otherRight)) {
+           crash = false;
+        }
+        
+        if (crash && myBottom > otherBottom) {
+            crash = 2;
+        }
+		
+        return crash;
+    }
+    
+    this.crashWithPlatforms = function() {
+		result = false;
+		for (var i = 0; i < platforms.length; i++) {
+			result = (result || this.crashWith(platforms[i]));
+		}
+		return result;
+	}
+    
+	this.stopMove = function() {
+        this.speedX = 0;
+        this.speedY = 0;
+    }
+}
+    
+function updateGameArea() {
+    myGameArea.clear();
+	//document.write('score: ' + score);
+    scoreDisplay.color = "Score: " + score;
+    scoreDisplay.update();
+    for (var i = 0; i < platforms.length; i++)
+        platforms[i].update();
+    for (var i = 0; i < enemies.length; i++) {
+        enemies[i].data.newPos();
+    }
+    player.stopMove(); 
+    
+    if (player.crashWithPlatforms() == 1) {
+        player.speedY = 0;
+        airTime = 0;
+        inAir = false;
+        gravity = 0;
+    }
+    
+    else {
+        gravity += gravitySpeed;
+        player.speedY += gravity;
+    }
+    
+    if (player.crashWithPlatforms() != 2)
+        handleInput();
+	
+    if (player.y+player.height/2 > canvasHeight) {
+        deathCause = "A long fall.";
+        gameOver();
+    }
+    
+    if (frame == 250) {
+        makeEnemy(0);
+    }
+    
+    
+    }
+    
+    for (var i = 0; i < enemies.length; i++) {
+        if (enemies[i] && enemies[i].data.crashWith(player)) {
+            if (enemies[i].type == "spike") {
+                deathCause = "A terrible stabbing";
+                if (spikeStorm > 0)
+                    deathCause = deathCause + " during a spike storm";
+                deathCause = deathCause + ".";
+                gameOver();
+            }
+            else {
+                player.speedX = enemies[i].data.speedX;
+                if (player.x > 750 || player.x < 450) {
+                    player.speedY = 2;
+                    gravity = 2;
+                }
+                else 
+                    player.speedY = 0;
+           }
+        }
+        
+        if (enemies[i].type == "block") {
+            if (frame > enemyStartFrame[i]+160 && frame < enemyStartFrame[i]+160*3 && frame%80 == 0){
+                enemies[i].data.image.src = "art/EnemyWarning.png";   
+            }
+            else if (frame > enemyStartFrame[i]+160 && frame < enemyStartFrame[i]+160*3 && frame%40 == 0){
+                enemies[i].data.image.src = "art/Enemy.png";   
+            }
+            else if (frame == enemyStartFrame[i]+160*3 ){
+                enemies[i].data.image.src = "art/EnemyWarning.png";
+                moveEnemy(enemies[i].data);
+            }
+        }
+        else {
+            if (frame == enemyStartFrame[i]+160*3 ){
+                moveEnemy(enemies[i].data);
+            }
+        }
+        if (enemies[i] && (enemies[i].data.x < 0 || enemies[i].data.x > canvasWidth || enemies[i].data.y < 0 || enemies[i].data.y > canvasHeight)&& !(score > scenario1Score && scenario1Done < 4))
+            makeEnemy(i);
+    }
+    
+    for (var i = 0; i < enemies.length; i++) {
+        enemies[i].data.update();
+    }
+    player.newPos();
+    
+    if (player.x > canvasWidth-player.width)
+        player.x = canvasWidth-player.width;
+    else if (player.x < 0)
+        player.x = 0;
+    
+    if (player.y < 0)
+        player.y = 0;
+    
+    player.update();
+    
+    frame++;
+}
+
+function makeEnemy(given) {
+    score++;
+    if (score > 10 && !spikeStorm) {
+        if (Math.random() > spikeStormChance) {
+            spikeChance = 0.2;
+            spikeStorm += 20;
+        }
+    }
+    
+    enemyStartFrame[given] = frame;
+    unitDone = false;
+    while (!unitDone) {
+        if (score > 5) {
+            if (Math.random() > spikeChance) {
+                var orientation = Math.round(Math.random()*3);
+
+                if (orientation == 0) {
+                    if (getUnitCords(1000,70+(Math.random()*19)*25))
+                        enemies[given] = {type: "spike", data: new component(25, 25, "art/RightSpike.png", unitX, unitY, "image")};
+                }
+                else if (orientation == 1) {
+                    if (getUnitCords(100,70+(Math.random()*19)*25))
+                        enemies[given] = {type: "spike", data: new component(25, 25, "art/LeftSpike.png", unitX, unitY, "image")};
+                }
+                else if (orientation == 2) {
+                    if (getUnitCords(400 + (Math.random()*400),30))
+                        enemies[given] = {type: "spike", data: new component(25, 25, "art/FallingSpike.png", unitX, unitY, "image")};
+                }
+                else {
+                    if (getUnitCords(400 + (Math.random()*400),620))
+                        enemies[given] = {type: "spike", data: new component(25, 25, "art/RisingSpike.png", unitX, unitY, "image")};
+                }
+            }
+            else { 
+                if (getUnitCords(100+900*(Math.round(Math.random())), 70+(Math.random()*19)*25))
+                    enemies[given] = {type: "block", data: new component(25, 25, "art/Enemy.png", unitX, unitY, "image")};
+            }
+        }
+        else {
+            if (getUnitCords(100+900*(Math.round(Math.random())),70+(Math.random()*19)*25))
+                enemies[given] = {type: "block", data: new component(25, 25, "art/Enemy.png", unitX, unitY, "image")};
+        }
+    }
+}
+
+function getUnitCords(givenX, givenY) {
+    unitX = givenX;
+    unitY = givenY;
+    unitDone = true;
+    if (enemies[enemies.length-1]) {
+        for (var i = 0; i < enemies.length-1; i++) {
+            if ((enemies[i].data.x > unitX-35 && enemies[i].data.x < unitX+35) && (enemies[i].data.y > unitY-35 && enemies[i].data.y < unitY+35))
+                unitDone = false;
+        }
+    }
+    return unitDone;
+}
+    
+function moveEnemy(given) {
+    if (given.x < 300) 
+        given.speedX = (2 + frame/50000);
+    else if (given.x > 900)
+        given.speedX = (-2 - frame/50000);
+    else if (given.y < 31)
+        given.speedY = (2 + frame/50000);
+    else 
+        given.speedY = (-2 - frame/50000);
+}
+    
+function handleInput() {
+    if (myGameArea.keys && myGameArea.keys[65]) {player.speedX = -1*playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[68]) {player.speedX = playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[87]) {jump()}
+    if (myGameArea.keys && myGameArea.keys[37]) {player.speedX = -1*playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[39]) {player.speedX = playerSpeed; }
+    if (myGameArea.keys && myGameArea.keys[38]) {jump()}
+}
+
+function jump() {
+    if (airTime < maxAirTime) {
+        player.speedY = -1 * playerSpeed;
+        inAir = true;
+        airTime++;
+    }
+}
+    
+function gameOver() {
+    localStorage.setItem('deathCause', '' + deathCause)
+	localStorage.setItem('score', '' + score)
+    myGameArea.stop();
+    sleep(500);
+    window.location = "death.html";
+}
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}    
+
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }
+}    
+    
+</script>
+</body>
+</html>

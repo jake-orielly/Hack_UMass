@@ -13,6 +13,7 @@
 <body>
     <br><br><br>
     <h1>PRESS THE SPACEBAR TO START THE GAME</h1>
+	<h1>PRESS ENTER TO PLAY HARDMODE</h1>
     <br>
     <center> 
         <img src="art/tutorial.png" style="width:600;height:600;" align="middle"> 
@@ -23,6 +24,9 @@
 	function checkKey(e) {
 		if (e.keyCode == 32){
 			window.location = "main.html";	
+		}
+		if (e.keyCode == 13){
+			window.location = "hardmode.html";	
 		}
 	}
 </script>
